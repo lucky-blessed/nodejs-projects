@@ -1,9 +1,8 @@
 // GitHub API client
 const https = require("https");
 
-function fetchUserActivity(username) {
-    // implementation
 
+function fetchUserActivity(username) {
     const url = `https://api.github.com/users/${username}/events`;
 
     const options = {
@@ -13,23 +12,33 @@ function fetchUserActivity(username) {
         }
     };
 
-    https.get(url, options, (res) => {
-        let data = "";
+    return new Promise((resolve, reject) => {
+        https.get(url, options, (res) => {
+            let data = "";
 
-        res.on("data", (chunk) => {
-            data += chunk;
-        });
+            if (res.statusCode !== 200) {
+                reject(new Error(`GitHub API responded with status ${res.statusCode}`));
+                res.resume();
+                return;
+            }
 
-        res.on("end", () => {
-            console.log("Raw response data received:");
-            console.log(data);
+            res.on("data", (chunk) => {
+                data += chunk;
+            });
+
+            res.on("end", () => {
+                try {
+                    const parsedData = JSON.parse(data);
+                    resolve(parsedData);
+                } catch (error) {
+                    reject(new Error("Failed to parse GitHub response"));
+                }
+            });
+        }).on("error", (err) => {
+            reject(new Error("Network error: " + err.message));
         });
-        //console.log("Status Code:", res.statusCode);
     });
 }
-
-
-
 
 
 
