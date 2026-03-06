@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const { fetchUserActivity } = require("../src/githubApi");
+const formatEvents = require("../utils/formatEvents");
 
 const username = process.argv[2];
 
@@ -14,8 +15,11 @@ console.log(`Fetching activity for ${username}...\n`);
 
 fetchUserActivity(username)
 .then((events) => {
-    console.log("Raw parsed events:");
-    console.log(events);
+    const formatedEvents = formatEvents(events);
+
+    formatedEvents.forEach(event => {
+        console.log(`- ${event}`);
+    })
 })
 .catch((error) => {
     console.error("Error", error.message);
