@@ -18,8 +18,21 @@ function formatEvents(events) {
 
             return `Starred ${repoName}`;
         }
+
+        else if (event.type === "ForkEvent") {
+            const repoName = event.repo?.name || "unknown repository";
+
+            return `Forked ${repoName}`;
+        }
+
+        else if (event.type === "CreateEvent") {
+            const repoName = event.repo?.name || "unknown repository";
+            const refType = event.payload?.ref_type || "something";
+
+            return `Created ${refType} in ${repoName}`;
+        }
         else {
-            return event.type;
+            return null;
         }
 
     }).filter(Boolean);
