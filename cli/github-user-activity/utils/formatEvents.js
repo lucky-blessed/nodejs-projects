@@ -2,14 +2,27 @@ function formatEvents(events) {
     return events.map(event => {
 
         if (event.type === "PushEvent") {
-            const commitCount = event.payload?.commits?.length || 0;
+            const commitCount = event.payload?.commits?.length;
+
+            if (!commitCount) {
+                return null;
+            }
+
             const repoName = event.repo?.name || "unknown repository";
 
             return `Pushed ${commitCount} commit(s) to ${repoName}`;
         }
 
-        return event.type;
-    });
+        else if (event.type === "WatchEvent") {
+            const repoName = event.repo?.name || "unknown repository";
+
+            return `Starred ${repoName}`;
+        }
+        else {
+            return event.type;
+        }
+
+    }).filter(Boolean);
 }
 
 
