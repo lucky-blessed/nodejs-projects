@@ -1,41 +1,43 @@
 function formatEvents(events) {
-    return events.map(event => {
 
+    const pushCounts = {};
+    const results = [];
+
+    events.forEach(event => {
         if (event.type === "PushEvent") {
-            const commitCount = event.payload?.commits?.length;
-
-            if (!commitCount) {
-                return null;
+            const repoName = event.repo?.name || "unknown repository";
+            
+            if (!pushCounts[repoName]) {
+                pushCounts[repoName] = 0;
             }
 
-            const repoName = event.repo?.name || "unknown repository";
-
-            return `Pushed ${commitCount} commit(s) to ${repoName}`;
+            pushCounts[repoName]++;
         }
 
         else if (event.type === "WatchEvent") {
             const repoName = event.repo?.name || "unknown repository";
-
-            return `Starred ${repoName}`;
-        }
-
-        else if (event.type === "ForkEvent") {
-            const repoName = event.repo?.name || "unknown repository";
-
-            return `Forked ${repoName}`;
+            results.push(`Starred ${repoName}`);
         }
 
         else if (event.type === "CreateEvent") {
             const repoName = event.repo?.name || "unknown repository";
             const refType = event.payload?.ref_type || "something";
 
-            return `Created ${refType} in ${repoName}`;
-        }
-        else {
-            return null;
+            results.push(`Created ${refType} in ${repoName}`);
         }
 
-    }).filter(Boolean);
+        else if (event.type === "ForkEvent") {
+            const repoName = event.repo?.name || "unknown repository";
+            results.push(`Forked ${repoName}`);
+        }
+    });
+
+    for (const repo in pushCounts) {
+        results.unshift(`Pushed ${pushCounts[repo]} time(s) to ${repo}`);
+    }
+
+    return results;
+   
 }
 
 
