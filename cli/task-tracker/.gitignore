@@ -1,0 +1,7 @@
+# Node
+node_modules/
+*.log
+.env
+# Runtime task data
+data/tasks.json
+*.zip
